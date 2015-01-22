@@ -1,7 +1,7 @@
 var ode = (function () {
 
     var $ = {};
-    
+
     $.euler = function (init, h, n, f) {
         var x0 = init['x0'],
             y0 = init['y0'],
