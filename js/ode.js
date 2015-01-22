@@ -1,7 +1,20 @@
 var ode = (function () {
 
-    var $ = {};
-
+    var $ = {}, // Public members
+        _ = {}; // Private members
+    
+    _.subst = function (expr, vars) {
+        
+    };
+    
+    _.parse = function (expr) {
+        
+    };
+    
+    _.eval = function (rpn) {
+        
+    };
+    
     $.euler = function (init, h, n, f) {
         var x0 = init['x0'],
             y0 = init['y0'],
