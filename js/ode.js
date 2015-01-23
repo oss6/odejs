@@ -41,8 +41,6 @@ var ode = (function () {
             nexpr += (vars[ch] !== undefined ? vars[ch] : ch);
         }
 
-        console.log(nexpr);
-
         return nexpr;
     };
 
@@ -52,9 +50,9 @@ var ode = (function () {
             postfix = "",
             o1, o2;
 
-        for (var i = 0; i < infix.length; i++) {
+        for (var i = 0, len = infix.length; i < len; i++) {
             token = infix[i];
-            if (token > "0" && token < "9") { // if token is operand (here limited to 0 <= x <= 9)
+            if (token >= "0" && token < "9") { // if token is operand (here limited to 0 <= x <= 9)
                 postfix += token + " ";
             }
             else if (ops.indexOf(token) != -1) { // if token is an operator
@@ -87,7 +85,6 @@ var ode = (function () {
                 postfix += s.pop() + " ";
             }
 
-        console.log(postfix);
         return postfix;
     };
 
@@ -97,6 +94,8 @@ var ode = (function () {
             tokens = rpn.split(''),
             stack = new _.Stack(),
             operators = ops.split('');
+
+        console.log(rpn);
 
         // Evaluate RPN
         while (tokens) {
@@ -138,6 +137,7 @@ var ode = (function () {
             var xn = xs[i],
                 yn = ys[i];
 
+            console.log(_.eval(f, {'x': xn, 'y': yn}));
             ys.push(yn + (h * _.eval(f, {'x': xn, 'y': yn})));
         }
 
