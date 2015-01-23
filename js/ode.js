@@ -1,7 +1,18 @@
 var ode = (function () {
 
     var $ = {}, // Public members
-        _ = {}; // Private members
+        _ = {}, // Private members
+
+        ops = "-+/*^",
+        op_map = {
+            '+': function (a, b) { return a + b },
+            '-': function (a, b) { return a - b },
+            '*': function (a, b) { return a * b },
+            '/': function (a, b) { return a / b },
+            '^': function (a, b) { return Math.pow(a, b) }
+        },
+        precedence = {"^":4, "*":3, "/":3, "+":2, "-":2},
+        associativity = {"^":"Right", "*":"Left", "/":"Left", "+":"Left", "-":"Left"};
 
     _.Stack = function () {
             this.dataStore = [];
@@ -25,22 +36,21 @@ var ode = (function () {
         var nexpr = '';
 
         for (var i = 0, len = expr.length; i < len; i++) {
-            var ch = str[i];
+            var ch = expr[i];
 
-            nexpr += (vars[ch] ? vars[ch] : ch);
+            nexpr += (vars[ch] !== undefined ? vars[ch] : ch);
         }
+
+        console.log(nexpr);
 
         return nexpr;
     };
 
     _.postfix = function (infix) {
-        var s = new _.Stack();
-        var ops = "-+/*^";
-        var precedence = {"^":4, "*":3, "/":3, "+":2, "-":2};
-        var associativity = {"^":"Right", "*":"Left", "/":"Left", "+":"Left", "-":"Left"};
-        var token;
-        var postfix = "";
-        var o1, o2;
+        var s = new _.Stack(),
+            token,
+            postfix = "",
+            o1, o2;
 
         for (var i = 0; i < infix.length; i++) {
             token = infix[i];
@@ -77,14 +87,40 @@ var ode = (function () {
                 postfix += s.pop() + " ";
             }
 
+        console.log(postfix);
         return postfix;
     };
 
     _.eval = function (e, vars) {
         var expr = _.subst(e.replace(/\s+/g, ''), vars),
-            postfix = _.postfix(expr);
+            rpn = _.postfix(expr),
+            tokens = rpn.split(''),
+            stack = new _.Stack(),
+            operators = ops.split('');
 
+        // Evaluate RPN
+        while (tokens) {
+            var token = tokens.pop();
 
+            if (operators.indexOf(token) === -1) {
+                stack.push(token);
+            }
+            else {
+                if (stack.length() < 2) return false; // throw exception
+                else {
+                    // Pop 2 values
+                    var op1 = stack.pop(),
+                        op2 = stack.pop(),
+                        fn = op_map[token];
+
+                    stack.push(fn(op1, op2));
+                }
+            }
+        }
+
+        if (stack.length() === 1) return stack[0];
+
+        return false; // throw exception
     };
 
     $.euler = function (init, h, n, f) {
@@ -118,8 +154,3 @@ var ode = (function () {
     return $;
 
 })();
-
-
-
-var infix = "3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3";
-infix = infix.replace(/\s+/g, ''); // remove spaces, so infix[i]!=" "
