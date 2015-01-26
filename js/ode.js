@@ -14,9 +14,10 @@ var ode = (function () {
         precedence = {"^":4, "*":3, "/":3, "+":2, "-":2},
         associativity = {"^":"Right", "*":"Left", "/":"Left", "+":"Left", "-":"Left"};
 
-    _.Stack = function () {
-            this.dataStore = [];
-            this.top = 0;
+    _.Stack = function (dataStore) {
+            this.dataStore = dataStore || [];
+            this.top = dataStore ? dataStore.length : 0;
+
             this.push = function (element) {
                 this.dataStore[this.top++] = element;
             };
@@ -90,34 +91,30 @@ var ode = (function () {
 
     _.eval = function (e, vars) {
         var expr = _.subst(e.replace(/\s+/g, ''), vars),
-            rpn = _.postfix(expr),
+            rpn = _.postfix(expr).replace(/\s+/g, ''),
             tokens = rpn.split(''),
-            stack = new _.Stack(),
+            stack = [],
             operators = ops.split('');
 
-        console.log(rpn);
-
         // Evaluate RPN
-        while (tokens) {
-            var token = tokens.pop();
-
+        tokens.forEach(function (token) {
             if (operators.indexOf(token) === -1) {
                 stack.push(token);
             }
             else {
-                if (stack.length() < 2) return false; // throw exception
+                if (stack.length < 2) return false; // throw exception
                 else {
                     // Pop 2 values
-                    var op1 = stack.pop(),
-                        op2 = stack.pop(),
+                    var op1 = parseFloat(stack.pop()),
+                        op2 = parseFloat(stack.pop()),
                         fn = op_map[token];
-
+                        
                     stack.push(fn(op1, op2));
                 }
             }
-        }
+        });
 
-        if (stack.length() === 1) return stack[0];
+        if (stack.length === 1) return stack[0];
 
         return false; // throw exception
     };
