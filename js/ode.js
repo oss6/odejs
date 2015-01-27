@@ -157,7 +157,7 @@ var ode = (function () {
             var xn = xs[i],
                 yn = ys[i],
                 fxy = _.eval(f, {'x': xn, 'y': yn});
-            
+
             ys.push(yn + (h * fxy));
         }
 
@@ -167,8 +167,58 @@ var ode = (function () {
         };
     };
 
-    $.midPoint = function () {
+    $.midPoint = function (init, h, n, f) {
+        var x0 = init['x0'],
+            y0 = init['y0'],
+            xs = [x0],
+            ys = [y0];
 
+        // Create xs
+        for (var x = 1; x <= n; x++)
+            xs.push(x0 + x * h);
+
+        for (var i = 0; i < n; i++) {
+            var xn = xs[i],
+                yn = ys[i],
+                _fxy = _.eval(f, {'x': xn, 'y': yn});
+                fxy = _.eval(f, {'x': xn + (h / 2), 'y': (h / 2) * _fxy});
+
+            ys.push(yn + (h * fxy));
+        }
+
+        return {
+            'xs': xs,
+            'ys': ys
+        };
+    };
+
+    $.rk4 = function (init, h, n, f) {
+        var x0 = init['x0'],
+            y0 = init['y0'],
+            xs = [x0],
+            ys = [y0];
+
+        // Create xs
+        for (var x = 1; x <= n; x++)
+            xs.push(x0 + x * h);
+
+        for (var i = 0; i < n; i++) {
+            var xn = xs[i],
+                yn = ys[i],
+
+                // Fix these
+                k1 = 0,
+                k2 = 0,
+                k3 = 0,
+                k4 = 0;
+
+            ys.push(yn + ((h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)));
+        }
+
+        return {
+            'xs': xs,
+            'ys': ys
+        };
     };
 
     return $;
