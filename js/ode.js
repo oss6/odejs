@@ -89,10 +89,33 @@ var ode = (function () {
         return postfix;
     };
 
+    _.getComponents = function (str) {
+        var arr = [],
+            num = '',
+            operators = ops.split('');
+
+        for (var i = 0, len = str.length; i < len; i++) {
+            var ch = str[i];
+
+            if (ch === '(' || ch === ')' || operators.indexOf(ch) !== -1) {
+                if (num !== '') arr.push(num);
+                num = '';
+                arr.push(ch);
+            }
+            else {
+                num += ch;
+            }
+        }
+
+        arr.push(num); // Push remaining number
+
+        return arr;
+    };
+
     _.eval = function (e, vars) {
         var expr = _.subst(e.replace(/\s+/g, ''), vars),
-            rpn = _.postfix(expr).replace(/\s+/g, ''),
-            tokens = rpn.split(''),
+            rpn = _.postfix(_.getComponents(expr)),
+            tokens = rpn.slice(0, rpn.length - 1).split(' '),
             stack = [],
             operators = ops.split('');
 
@@ -108,7 +131,7 @@ var ode = (function () {
                     var op1 = parseFloat(stack.pop()),
                         op2 = parseFloat(stack.pop()),
                         fn = op_map[token];
-                        
+
                     stack.push(fn(op1, op2));
                 }
             }
@@ -132,10 +155,10 @@ var ode = (function () {
         // Create ys
         for (var i = 0; i < n; i++) {
             var xn = xs[i],
-                yn = ys[i];
-
-            console.log(_.eval(f, {'x': xn, 'y': yn}));
-            ys.push(yn + (h * _.eval(f, {'x': xn, 'y': yn})));
+                yn = ys[i],
+                fxy = _.eval(f, {'x': xn, 'y': yn});
+            
+            ys.push(yn + (h * fxy));
         }
 
         return {
