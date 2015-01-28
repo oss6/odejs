@@ -1,0 +1,24 @@
+body {
+    font-family: 'Open Sans';
+}
+
+h1#title {
+    font-weight: 100;
+    text-align: center;
+}
+
+a#doc-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-weight: 100;
+    display: inline-block;
+    padding: 8px 15px;
+    text-decoration: none;
+    color: #fafafa;
+    background-color: #323232;
+}
+
+a#doc-btn:hover {
+    background-color: #424242;
+}
