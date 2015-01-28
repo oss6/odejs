@@ -12,7 +12,7 @@ ode.solve(method, params)
     - `n : number` specifies the x range
     - `f : string` specifies the derivative expression `y' = f(x, y)`
 
-** N.B.: at the moment the accepted operators are just the basic ones. Later there will be support for trigonometric functions. **
+**N.B.: at the moment the accepted operators are just the basic ones. Later there will be support for trigonometric functions.**
 
 In the following methods the `params` variable will be:
 ```javascript
