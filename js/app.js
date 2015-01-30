@@ -5,6 +5,8 @@ var odeApp = (function () {
         canvas,
         ctx;
 
+    Chart.defaults.global.responsive = true;
+
     _.MethodVisualizer = function (points) {
         this.chart  = null;
         this.canvas = null;
@@ -18,8 +20,9 @@ var odeApp = (function () {
             };
 
             this.canvas = document.getElementById(id);
-            this.canvas.width = 500;
-            this.canvas.height = 500;
+            /*this.canvas.width = 500;
+            this.canvas.height = 500;*/
+
             this.ctx = this.canvas.getContext('2d');
             this.chart = new Chart(this.ctx).Line(this.getData(), options);
         };
@@ -49,27 +52,25 @@ var odeApp = (function () {
     $.init = function () {
         // Get data
         var params = {
-            f: 'x*y + 2*x + 3',
+            f: 'x^2',
             init: {
                 'x0': 0,
-                'y0': 3
+                'y0': 2
             },
-            h: 0.01,
-            n: 50
+            h: 0.25,
+            n: 3
         },
         euler    = new _.MethodVisualizer(ode.solve('euler', params)),
         midPoint = new _.MethodVisualizer(ode.solve('midpoint', params)),
         rk4      = new _.MethodVisualizer(ode.solve('rk4', params));
 
-        // Event handlers
-        /*window.addEventListener('resize', function () {
-            _.draw();
-        }, false);*/
-
         // Set canvas (visualization)
         euler.draw('eulerChart');
         midPoint.draw('midPointChart');
         rk4.draw('rk4Chart');
+
+        // Syntax highlighting
+        hljs.initHighlighting();
     };
 
     return $;

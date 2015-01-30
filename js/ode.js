@@ -113,10 +113,21 @@ var ode = (function () {
 
         for (var i = 0, len = infix.length; i < len; i++) {
             token = infix[i];
-            if (token >= "0" && token < "9") { // if token is operand (here limited to 0 <= x <= 9)
+
+            if (token == "(") { // if token is left parenthesis
+                s.push(token); // then push it onto the stack
+            }
+            else if (token == ")") { // if token is right parenthesis
+                while (s.peek() != "("){ // until token at top is (
+                    postfix += s.pop() + " ";
+                }
+
+                s.pop(); // pop (, but not onto the output queue
+            }
+            else if (ops.indexOf(token) === -1) { // if token is operand (here limited to 0 <= x <= 9)
                 postfix += token + " ";
             }
-            else if (ops.indexOf(token) != -1) { // if token is an operator
+            else { // if token is an operator
                 o1 = token;
                 o2 = s.peek();
                 while (ops.indexOf(o2)!=-1 && ( // while operator token, o2, on top of the stack
@@ -132,19 +143,11 @@ var ode = (function () {
                 }
                 s.push(o1); // push o1 onto the stack
             }
-            else if (token == "(") { // if token is left parenthesis
-                s.push(token); // then push it onto the stack
-            }
-            else if (token == ")") { // if token is right parenthesis
-                while (s.peek() != "("){ // until token at top is (
-                    postfix += s.pop() + " ";
-                }
-                s.pop(); // pop (, but not onto the output queue
-                }
-            }
-            while (s.length()>0){
-                postfix += s.pop() + " ";
-            }
+        }
+
+        while (s.length() > 0) {
+            postfix += s.pop() + " ";
+        }
 
         return postfix;
     };
@@ -270,7 +273,7 @@ var ode = (function () {
                 k2 = _.eval(f, {'x': xn + (h / 2), 'y': yn + (1 / 2) * k1 * h}),
                 k3 = _.eval(f, {'x': xn + (h / 2), 'y': yn + (1 / 2) * k2 * h}),
                 k4 = _.eval(f, {'x': xn + h, 'y': yn + k3 * h});
-                
+
             ys.push(yn + ((h / 6) * (k1 + (2 * k2) + (2 * k3) + k4)));
         }
 

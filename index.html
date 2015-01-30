@@ -5,18 +5,85 @@
         <title>ODE JS</title>
 
         <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
         <link type="text/css" rel="stylesheet" href="css/app.css" />
     </head>
 
     <body>
-        <h1 id="title">Numerical Methods for solving Ordinary Differential Equations </h1>
-        <a href="https://github.com/oss6/odejs/blob/master/README.md" id="doc-btn">Documentation</a>
-        <canvas id="eulerChart"></canvas>
-        <canvas id="midPointChart"></canvas>
-        <canvas id="rk4Chart"></canvas>
+        <h1 id="title"><a href="https://github.com/oss6/odejs">&rtrif; Numerical Methods for solving Ordinary Differential Equations &ltrif;</a></h1>
+        <hr>
+
+        <div class="section group">
+            <div class="col col span_1_of_3">
+                <h3>Euler method</h3>
+                <canvas id="eulerChart"></canvas>
+                <p>
+                    It is the most basic explicit method for numerical integration of ordinary differential equations and is the simplest Runge–Kutta method.
+                </p>
+                <b>Usage</b>
+                <pre>
+                    <code class="javascript">
+var params = {
+    'init': { 'x0': 0, 'y0': 2 },
+    'h': 0.25,
+    'n': 3,
+    'f': 'x^2'
+};
+ode.solve('euler', params);
+                    </code>
+                </pre>
+            </div>
+
+            <div class="col span_1_of_3">
+                <h3>Mid-point method</h3>
+                <canvas id="midPointChart"></canvas>
+                <p>
+                    The Euler method uses a one-sided estimate of the derivative to advance the system from time i to time i + 1.
+                    We would do better if we could use a centered estimate that is, if we know the derivative at the center of the interval.
+                    - <a href="http://www.physics.drexel.edu/students/courses/Comp_Phys/Integrators/simple.html">
+                        The Euler &amp; Mid-point Methods
+                    </a>
+                </p>
+                <b>Usage</b>
+                <pre>
+                    <code class="javascript">
+var params = {
+    'init': { 'x0': 0, 'y0': 2 },
+    'h': 0.25,
+    'n': 3,
+    'f': 'x^2'
+};
+ode.solve('midpoint', params);
+                    </code>
+                </pre>
+            </div>
+
+            <div class="col span_1_of_3">
+                <h3>RK4 method</h3>
+                <canvas id="rk4Chart"></canvas>
+                <p>
+                    The most often used method of the Runge-Kutta family is the Fourth-Order one,
+                    which extends the idea of the mid-point method, by "jumping" 1/4th of the way first,
+                    then going half-way, then going 3/4th of the way and finally "jumping" all the way.
+                </p>
+                <b>Usage</b>
+                <pre>
+                    <code class="javascript">
+var params = {
+    'init': { 'x0': 0, 'y0': 2 },
+    'h': 0.25,
+    'n': 3,
+    'f': 'x^2'
+};
+ode.solve('rk4', params);
+                    </code>
+                </pre>
+            </div>
+        </div>
 
         <!-- JS -->
         <script src="js/Chart.min.js" width="600" height="600"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
         <script src="js/ode.js"></script>
         <script src="js/app.js"></script>
     </body>
