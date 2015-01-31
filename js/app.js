@@ -52,7 +52,7 @@ var odeApp = (function () {
     $.init = function () {
         // Get data
         var params = {
-            f: 'x^2',
+            f: 'x + cos(x)',
             init: {
                 'x0': 0,
                 'y0': 2

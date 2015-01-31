@@ -38,7 +38,16 @@ var parser = (function () {
                 'associativity': 'R',
                 'fn': function (a, b) { return Math.pow(a, b) }
             },
-        };
+
+            'cos': {
+                'arity': 1,
+                'precedence': 4,
+                'associativity': 'L',
+                'fn': function (a) { return Math.cos(a) }
+            }
+        },
+
+        functions = ['cos'];
 
     _.Stack = function (dataStore) {
         this.dataStore = dataStore || [];
@@ -80,23 +89,27 @@ var parser = (function () {
 
                 s.pop(); // pop (, but not onto the output queue
             }
-            else if (!operators.hasOwnProperty(token)) {
+            else if (!operators.hasOwnProperty(token)) { // operand
                 postfix += token + " ";
             }
             else { // if token is an operator
-                o1 = token;
-                o2 = s.peek();
-                while (operators.hasOwnProperty(o2) && ( // while operator token, o2, on top of the stack
-                    // and o1 is left-associative and its precedence is less than or equal to that of o2
-                    (operators[o1].associativity === "L" && (operators[o1].precedence <= operators[o2].precedence) ) ||
-                    // or o1 is right-associative and its precedence is less than that of o2
-                    (operators[o1].associativity === "R" && (operators[o1].precedence < operators[o2].precedence))
-                )) {
-                    postfix += o2 + " "; // add o2 to output queue
-                    s.pop(); // pop o2 of the stack
-                    o2 = s.peek(); // next round
+                if (functions.indexOf(token) !== -1)
+                    s.push(token);
+                else {
+                    o1 = token;
+                    o2 = s.peek();
+                    while (operators.hasOwnProperty(o2) && ( // while operator token, o2, on top of the stack
+                        // and o1 is left-associative and its precedence is less than or equal to that of o2
+                        (operators[o1].associativity === "L" && (operators[o1].precedence <= operators[o2].precedence) ) ||
+                        // or o1 is right-associative and its precedence is less than that of o2
+                        (operators[o1].associativity === "R" && (operators[o1].precedence < operators[o2].precedence))
+                    )) {
+                        postfix += o2 + " "; // add o2 to output queue
+                        s.pop(); // pop o2 of the stack
+                        o2 = s.peek(); // next round
+                    }
+                    s.push(o1); // push o1 onto the stack
                 }
-                s.push(o1); // push o1 onto the stack
             }
         }
 
@@ -107,9 +120,21 @@ var parser = (function () {
         return postfix.slice(0, postfix.length - 1);
     };
 
+    _.getFnIndices = function (str) {
+        var re = /cos/g,
+            indices = [];
+
+        while ((match = re.exec(str)) != null) {
+            indices.push(match.index);
+        }
+
+        return indices;
+    };
+
     _.getComponents = function (str) {
         var arr = [],
-            num = '';
+            num = '',
+            fnIndices = _.getFnIndices(str);
 
         for (var i = 0, len = str.length; i < len; i++) {
             var ch = str[i];
@@ -119,35 +144,47 @@ var parser = (function () {
                 num = '';
                 arr.push(ch);
             }
+            else if (fnIndices.indexOf(i) !== -1) {
+                var fnName = ch + str[++i] + str[++i];
+                arr.push(fnName);
+            }
             else {
                 num += ch;
             }
         }
 
-        arr.push(num); // Push remaining number
-
+        if (num !== '')
+            arr.push(num); // Push remaining number
+        console.log(arr);
         return arr;
     };
 
     _.eval = function (root, scope) {
         var isLeaf = (root.left === null && root.right === null),
             val = root.val;
-            
+
         if (isLeaf) { return scope[val] !== undefined ? scope[val] : val; }
         else {
-            return operators[val].fn(_.eval(root.left, scope), _.eval(root.right, scope));  // Check this
+            var arity = operators[val].arity;
+
+            return arity === 1 ?
+                operators[val].fn(_.eval(root.left, scope)) :
+                operators[val].fn(_.eval(root.left, scope), _.eval(root.right, scope));
         }
     };
 
     // From string expr to expr tree
     $.parse = function (expr) {
         // Get postfix notation
-        var pfix = _.postfix(_.getComponents(expr)).split(' '),
+        var pfix = _.postfix(_.getComponents(expr.replace(/\s+/g, ''))).split(' '),
             expt = null, // Empty tree
             pstack = [];
 
+        console.log(pfix);
+
         // From postfix notation to expr tree
         for (var i = 0, len = pfix.length; i < len; i++) {
+            console.log(pstack);
             var sym = pfix[i];
 
             if (!operators.hasOwnProperty(sym)) { // Operands
@@ -173,6 +210,8 @@ var parser = (function () {
                 );
             }
         }
+
+        //console.log(pstack);
 
         if (pstack.length === 1) return $.ExprTree(pstack[0]);
         else return false;
