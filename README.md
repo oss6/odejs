@@ -36,6 +36,7 @@ var points = ode.solve('euler', params);
 
 ## Midpoint (Runge-Kutta second order)
 **Description**
+The Euler method uses a one-sided estimate of the derivative to advance the system from time i to time i+1. We would do better if we could use a centered estimate--that is, if we know the derivative at the center of the interval, at time i + 1/2. The reason for this becomes clear if we look at the Taylor series. Imagine applying the Euler method, but use the derivative at the mid-point, instead of at the start of the range.
 
 **Usage**
 ```javascript
